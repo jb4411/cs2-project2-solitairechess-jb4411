@@ -210,6 +210,7 @@ public class SoltrChessModel implements Observer{
         this.board[selectedRow][selectedCol] = Piece.NONE;
         this.numPieces--;
 
+        // check if the game has been won, is no longer solvable, or is still going on
         if (this.numPieces == 1) {
             this.status = Status.SOLVED;
         }
