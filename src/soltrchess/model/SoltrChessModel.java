@@ -141,6 +141,23 @@ public class SoltrChessModel implements Observer{
                 return Math.abs(selectedCol - moveCol) <= 1 && Math.abs(selectedRow - moveRow) <= 1;
             }
             case KNIGHT -> {
+                if (selectedCol == moveCol || selectedRow == moveRow) {
+                    return false;
+                } else {
+                    if (Math.abs(moveRow - selectedRow) == 1) {
+                        if (Math.abs(moveCol - selectedCol) == 2) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else if (Math.abs(moveCol - selectedCol) == 1) {
+                        if (Math.abs(moveRow - selectedRow) == 2) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
             }
             case PAWN -> {
                 if (selectedCol == moveCol || selectedRow == moveRow) {
@@ -150,6 +167,15 @@ public class SoltrChessModel implements Observer{
                 }
             }
             case QUEEN -> {
+                if (selectedCol == moveCol || selectedRow == moveRow) {
+                    if (moveCol != selectedCol) {
+                        return moveRow == selectedRow;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol);
+                }
             }
             case ROOK -> {
                 if (moveCol != selectedCol) {
