@@ -49,6 +49,8 @@ public class SoltrChessModel implements Observer{
     private int moveCol;
     /** the row of the place to move to */
     private int moveRow;
+    /** */
+    private int numPieces;
 
     /**
      * Create a new board.
@@ -56,6 +58,7 @@ public class SoltrChessModel implements Observer{
     public SoltrChessModel(String filename) throws FileNotFoundException {
         this.status = Status.NOT_OVER;
         this.board = new Piece[ROWS][COLS];
+        this.numPieces = 0;
 
         Scanner f = new Scanner(new File(filename));
 
@@ -64,6 +67,7 @@ public class SoltrChessModel implements Observer{
             for (int col=0; col<COLS; ++col) {
                 String next = f.next();
                 Piece current;
+                this.numPieces++;
                 switch (next) {
                     case "B" -> {
                         current = Piece.BISHOP;
@@ -85,6 +89,7 @@ public class SoltrChessModel implements Observer{
                     }
                     default -> {
                         current = Piece.NONE;
+                        this.numPieces--;
                     }
                 }
                 this.board[row][col] = current;
@@ -112,11 +117,11 @@ public class SoltrChessModel implements Observer{
     /**
      * Is this a valid move?
      *
-     * @param selectedCol
-     * @param selectedRow
-     * @param moveCol
-     * @param moveRow
-     * @return
+     * @param selectedCol the column of the selected piece to move
+     * @param selectedRow the row of the selected piece to move
+     * @param moveCol the column of the space to move to
+     * @param moveRow the row of the space to move to
+     * @return whether or not the move is valid
      */
     public boolean isValidMove(int selectedCol, int selectedRow, int moveCol, int moveRow) {
        if (this.board[moveCol][moveRow].equals(Piece.NONE)) {
@@ -187,6 +192,26 @@ public class SoltrChessModel implements Observer{
             default -> {
                 return false;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Make a move by placing a disc in a valid column.
+     *
+     * @rit.pre the move must be valid
+     * @param selectedCol the column of the selected piece to move
+     * @param selectedRow the row of the selected piece to move
+     * @param moveCol the column of the space to move to
+     * @param moveRow the row of the space to move to
+     */
+    public void makeMove(int selectedCol, int selectedRow, int moveCol, int moveRow) {
+        this.board[moveRow][moveCol] = this.board[selectedRow][selectedCol];
+        this.board[selectedRow][selectedCol] = Piece.NONE;
+        this.numPieces--;
+
+        if (this.numPieces == 1) {
+            this.status = Status.SOLVED;
         }
     }
 
