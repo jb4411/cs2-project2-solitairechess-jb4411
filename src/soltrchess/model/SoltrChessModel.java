@@ -115,6 +115,105 @@ public class SoltrChessModel implements Observer{
     }
 
     /**
+     * Get the status of the game.
+     *
+     * @return game status
+     */
+    public Status getGameStatus() {
+        return this.status;
+    }
+
+    public Piece getContents(int row, int col) {
+        return this.board[row][col];
+    }
+
+    public boolean hasCollision(int selectedCol, int selectedRow, int moveCol, int moveRow, boolean diagonal) {
+        int currentCol = selectedCol;
+        int currentRow = selectedRow;
+        if (diagonal) {
+            if (moveRow - selectedRow < 0) { //moving up
+                if (moveCol - selectedCol < 0) { //moving up-left
+                    while (currentCol > moveCol && currentRow > moveRow) {
+                        currentCol--;
+                        currentRow--;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else { //moving up-right
+                    while (currentCol < moveCol && currentRow > moveRow) {
+                        currentCol++;
+                        currentRow--;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            } else { //moving down
+                if (moveCol - selectedCol < 0) { //moving down-left
+                    while (currentCol > moveCol && currentRow < moveRow) {
+                        currentCol--;
+                        currentRow++;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else { //moving down-right
+                    while (currentCol < moveCol && currentRow < moveRow) {
+                        currentCol++;
+                        currentRow++;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        } else {
+            if (moveCol != selectedCol) { //moving left or right
+                if (selectedCol > moveCol) { //moving left
+                    while (currentCol > moveCol) {
+                        currentCol--;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else { //moving right
+                    while (currentCol < moveCol) {
+                        currentCol++;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            } else { //moving up or down
+                if (selectedRow > moveRow) { //moving up
+                    while (currentRow > moveRow) {
+                        currentRow--;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } else { //moving down
+                    while (currentRow < moveRow) {
+                        currentRow++;
+                        if (getContents(currentRow, currentCol) != Piece.NONE) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+    }
+
+    /**
      * Is this a valid move?
      *
      * @param selectedCol the column of the selected piece to move
@@ -139,7 +238,11 @@ public class SoltrChessModel implements Observer{
                 if (selectedCol == moveCol || selectedRow == moveRow) {
                     return false;
                 } else {
-                    return Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol);
+                    if (Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol)) {
+                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
+                    } else {
+                        return false;
+                    }
                 }
             }
             case KING -> {
@@ -173,20 +276,24 @@ public class SoltrChessModel implements Observer{
             }
             case QUEEN -> {
                 if (selectedCol == moveCol || selectedRow == moveRow) {
-                    if (moveCol != selectedCol) {
-                        return moveRow == selectedRow;
-                    } else {
-                        return true;
-                    }
+                    return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
                 } else {
-                    return Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol);
+                    if (Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol)) {
+                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
+                    } else {
+                        return false;
+                    }
                 }
             }
             case ROOK -> {
                 if (moveCol != selectedCol) {
-                    return moveRow == selectedRow;
+                    if (moveRow == selectedRow) {
+                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
+                    } else {
+                        return false;
+                    }
                 } else {
-                    return true;
+                    return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
                 }
             }
             default -> {
