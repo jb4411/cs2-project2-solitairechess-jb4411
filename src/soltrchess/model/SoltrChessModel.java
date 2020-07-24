@@ -11,7 +11,7 @@ import java.util.Scanner;
  *
  * @author Jesse Burdick-Pless jb4411@g.rit.edu
  */
-public class SoltrChessModel implements Observer{
+public class SoltrChessModel {
     /** the number of rows */
     public final static int ROWS = 4;
     /** the number of columns */
@@ -38,7 +38,7 @@ public class SoltrChessModel implements Observer{
     /** the status of the game */
     private Status status;
     /** the observers of this model */
-    private List<Observer<SoltrChessModel, ClientData>> observers;
+    private List<Observer<SoltrChessModel, String>> observers;
     /** the game board */
     private Piece[][] board;
     /** the column of the piece that was selected */
@@ -103,13 +103,13 @@ public class SoltrChessModel implements Observer{
      *
      * @param observer the observer
      */
-    public void addObserver(Observer<SoltrChessModel, ClientData> observer) {
+    public void addObserver(Observer<SoltrChessModel, String> observer) {
         this.observers.add(observer);
     }
 
     /** When the model changes, the observers are notified via their update() method */
     private void notifyObservers() {
-        for (Observer<SoltrChessModel, ClientData> obs: this.observers ) {
+        for (Observer<SoltrChessModel, String> obs: this.observers ) {
             obs.update(this, null);
         }
     }
@@ -123,10 +123,27 @@ public class SoltrChessModel implements Observer{
         return this.status;
     }
 
+    /**
+     * Get the piece at the selected row and column.
+     *
+     * @param row the selected row
+     * @param col the selected column
+     * @return the piece at the selected row and column
+     */
     public Piece getContents(int row, int col) {
         return this.board[row][col];
     }
 
+    /**
+     * Check whether or not there will be a collision when a piece moves
+     *
+     * @param selectedCol the column of the selected piece to move
+     * @param selectedRow the row of the selected piece to move
+     * @param moveCol the column of the space to move to
+     * @param moveRow the row of the space to move to
+     * @param diagonal whether or not to check the diagonal
+     * @return whether or not there is a collision
+     */
     public boolean hasCollision(int selectedCol, int selectedRow, int moveCol, int moveRow, boolean diagonal) {
         int currentCol = selectedCol;
         int currentRow = selectedRow;
@@ -321,10 +338,50 @@ public class SoltrChessModel implements Observer{
         if (this.numPieces == 1) {
             this.status = Status.SOLVED;
         }
+
+        // let the view know a move has been made
+        notifyObservers();
     }
 
+    /**
+     * Returns a string representation of the board, suitable for printing out.
+     *
+     * @return the string representation
+     */
     @Override
-    public void update(Object o, Object o2) {
-
+    public String toString() {
+        StringBuilder boardString = new StringBuilder();
+        for (int row = 0; row < ROWS; ++row) {
+            for (int col = 0; col < COLS; ++col) {
+                Piece current = this.board[row][col];
+                String next;
+                switch (current) {
+                    case BISHOP -> {
+                        next = "B";
+                    }
+                    case KING -> {
+                        next = "K";
+                    }
+                    case KNIGHT -> {
+                        next = "N";
+                    }
+                    case PAWN -> {
+                        next = "P";
+                    }
+                    case QUEEN -> {
+                        next = "Q";
+                    }
+                    case ROOK -> {
+                        next = "R";
+                    }
+                    default -> {
+                        next = "-";
+                    }
+                }
+                boardString.append(next).append(" ");
+            }
+            boardString.append("\n");
+        }
+        return String.valueOf(boardString);
     }
 }
