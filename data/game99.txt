@@ -1,5 +1,5 @@
-P P P -
-B K P -
-P P P -
-- - - -
+N N N N
+N N N N
+N N N N
+N N N N
 59. expert

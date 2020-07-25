@@ -150,41 +150,49 @@ public class SoltrChessModel {
         if (diagonal) {
             if (moveRow - selectedRow < 0) { //moving up
                 if (moveCol - selectedCol < 0) { //moving up-left
+                    currentCol--;
+                    currentRow--;
                     while (currentCol > moveCol && currentRow > moveRow) {
-                        currentCol--;
-                        currentRow--;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol--;
+                        currentRow--;
                     }
                     return true;
                 } else { //moving up-right
+                    currentCol++;
+                    currentRow--;
                     while (currentCol < moveCol && currentRow > moveRow) {
-                        currentCol++;
-                        currentRow--;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol++;
+                        currentRow--;
                     }
                     return true;
                 }
             } else { //moving down
                 if (moveCol - selectedCol < 0) { //moving down-left
+                    currentCol--;
+                    currentRow++;
                     while (currentCol > moveCol && currentRow < moveRow) {
-                        currentCol--;
-                        currentRow++;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol--;
+                        currentRow++;
                     }
                     return true;
                 } else { //moving down-right
+                    currentCol++;
+                    currentRow++;
                     while (currentCol < moveCol && currentRow < moveRow) {
-                        currentCol++;
-                        currentRow++;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol++;
+                        currentRow++;
                     }
                     return true;
                 }
@@ -192,37 +200,41 @@ public class SoltrChessModel {
         } else {
             if (moveCol != selectedCol) { //moving left or right
                 if (selectedCol > moveCol) { //moving left
+                    currentCol--;
                     while (currentCol > moveCol) {
-                        currentCol--;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol--;
                     }
                     return true;
                 } else { //moving right
+                    currentCol++;
                     while (currentCol < moveCol) {
-                        currentCol++;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentCol++;
                     }
                     return true;
                 }
             } else { //moving up or down
                 if (selectedRow > moveRow) { //moving up
+                    currentRow--;
                     while (currentRow > moveRow) {
-                        currentRow--;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentRow--;
                     }
                     return true;
                 } else { //moving down
+                    currentRow++;
                     while (currentRow < moveRow) {
-                        currentRow++;
                         if (getContents(currentRow, currentCol) != Piece.NONE) {
                             return false;
                         }
+                        currentRow++;
                     }
                     return true;
                 }
@@ -240,7 +252,8 @@ public class SoltrChessModel {
      * @return whether or not the move is valid
      */
     public boolean isValidMove(int selectedCol, int selectedRow, int moveCol, int moveRow) {
-       if (this.board[moveCol][moveRow].equals(Piece.NONE)) {
+       if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
+           System.out.println("none");
             return false;
         } else if (selectedCol == moveCol && selectedRow == moveRow) {
             return false;
@@ -256,7 +269,7 @@ public class SoltrChessModel {
                     return false;
                 } else {
                     if (Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol)) {
-                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
+                        return hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
                     } else {
                         return false;
                     }
@@ -293,10 +306,10 @@ public class SoltrChessModel {
             }
             case QUEEN -> {
                 if (selectedCol == moveCol || selectedRow == moveRow) {
-                    return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
+                    return hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
                 } else {
                     if (Math.abs(moveRow - selectedRow) == Math.abs(moveCol - selectedCol)) {
-                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
+                        return hasCollision(selectedCol, selectedRow, moveCol, moveRow, true);
                     } else {
                         return false;
                     }
@@ -305,12 +318,12 @@ public class SoltrChessModel {
             case ROOK -> {
                 if (moveCol != selectedCol) {
                     if (moveRow == selectedRow) {
-                        return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
+                        return hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
                     } else {
                         return false;
                     }
                 } else {
-                    return !hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
+                    return hasCollision(selectedCol, selectedRow, moveCol, moveRow, false);
                 }
             }
             default -> {

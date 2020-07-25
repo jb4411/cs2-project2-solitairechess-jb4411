@@ -206,6 +206,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        this.selected = false;
         this.board.addObserver(this);
         this.statusBar.setText("Game file: " + filename);
         this.update(this.board, "restart");
