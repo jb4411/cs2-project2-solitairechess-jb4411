@@ -9,11 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import soltrchess.model.Observer;
 import soltrchess.model.SoltrChessModel;
 
 import javax.security.auth.Subject;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 public class SoltrChessGUI extends Application implements Observer<SoltrChessModel,String> {
@@ -54,6 +57,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private int selectedCol;
     /** the row of the piece that was selected */
     private int selectedRow;
+    /** the file chooser */
+    private FileChooser fileChooser;
+    /** the current file */
+    private String currentFile;
 
     /**
      * Has a starting piece been selected?
@@ -157,7 +164,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                     button.graphic = new StackPane();
                     button.graphic.getChildren().addAll(new ImageView(light), pieceImage);
                     button.setGraphic(button.graphic);
-                    button.changePiece(board.getContents(row,col));
+                    button.changePiece(this.board.getContents(row,col));
                     color = false;
                 } else {
                     ImageView pieceImage = new ImageView(blue);
@@ -165,7 +172,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                     button.graphic = new StackPane();
                     button.graphic.getChildren().addAll(new ImageView(dark), pieceImage);
                     button.setGraphic(button.graphic);
-                    button.changePiece(board.getContents(row,col));
+                    button.changePiece(this.board.getContents(row,col));
                     color = true;
                 }
 
@@ -193,6 +200,17 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         return gridPane;
     }
 
+    public void restart(String filename) {
+        try {
+            this.board = new SoltrChessModel(filename);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        this.board.addObserver(this);
+        this.statusBar.setText("Game file: " + filename);
+        this.update(this.board, "restart");
+    }
+
     /**
      * Construct the layout for the game.
      *
@@ -211,14 +229,31 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.selected = false;
         this.finished = false;
         this.buttonBoard = new ChessButton[SoltrChessModel.ROWS][SoltrChessModel.COLS];
+        this.currentFile = getParameters().getRaw().get(0);
 
         //create the status bar
-        this.statusBar = new Label("Game file: " + getParameters().getRaw().get(0));
+        this.statusBar = new Label("Game file: " + currentFile);
         borderPane.setTop(this.statusBar);
         BorderPane.setAlignment(this.statusBar, Pos.CENTER);
 
         //create the control button bar
         this.controlButtons = new HBox();
+        //create new game button
+        this.fileChooser = new FileChooser();
+        Button newGame = new Button("New Game");
+        newGame.setOnAction(event -> {
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            this.currentFile = selectedFile.toString();
+            this.restart(this.currentFile);
+        });
+        this.controlButtons.getChildren().add(newGame);
+        //create restart game button
+        Button restart = new Button("Restart");
+        restart.setOnAction(event -> {
+            this.restart(this.currentFile);
+        });
+        this.controlButtons.getChildren().add(restart);
+        this.controlButtons.setAlignment(Pos.CENTER);
         borderPane.setBottom(this.controlButtons);
 
         // get the grid pane from the helper method
@@ -236,6 +271,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
 
     @Override
     public void update(SoltrChessModel soltrChessModel, String s) {
-
+        for (int row = 0; row < SoltrChessModel.ROWS; row++) {
+            for (int col = 0; col < SoltrChessModel.COLS; col++) {
+                this.buttonBoard[row][col].changePiece(this.board.getContents(row, col));
+            }
+        }
     }
 }
