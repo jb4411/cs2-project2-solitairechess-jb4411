@@ -2,7 +2,7 @@
   <configuration default="false" name="SoltrChess gui" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="soltrchess.SoltrChess" />
     <module name="SolitaireChess" />
-    <option name="PROGRAM_PARAMETERS" value="gui data/game99.txt" />
+    <option name="PROGRAM_PARAMETERS" value="gui data/game00.txt" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="soltrchess.*" />

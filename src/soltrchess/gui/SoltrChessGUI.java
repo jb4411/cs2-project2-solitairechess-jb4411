@@ -152,8 +152,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private GridPane makeBoard(SoltrChessModel board) {
         GridPane gridPane = new GridPane();
         //build the grid of buttons
-        boolean color = true;
+        boolean color = false;
         for (int row = 0; row < SoltrChessModel.ROWS; row++) {
+            color = !color;
             for (int col = 0; col < SoltrChessModel.COLS; col++) {
                 ChessButton button = new ChessButton(row,col);
                 //button.setMinWidth(100);
@@ -268,7 +269,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         stage.setResizable(false);
         stage.show();
     }
-
 
     @Override
     public void update(SoltrChessModel soltrChessModel, String s) {
