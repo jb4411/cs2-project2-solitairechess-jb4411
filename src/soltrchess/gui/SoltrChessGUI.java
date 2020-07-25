@@ -48,6 +48,21 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private boolean finished;
     /** the HBox that stores the buttons for the control button bar */
     private HBox controlButtons;
+    /** has a starting piece been selected? */
+    private boolean selected;
+    /** the column of the piece that was selected */
+    private int selectedCol;
+    /** the row of the piece that was selected */
+    private int selectedRow;
+
+    /**
+     * Has a starting piece been selected?
+     *
+     * @return whether or not a starting piece has been selected
+     */
+    public boolean hasBeenSelected() {
+        return this.selected;
+    }
 
     private class ChessButton extends Button {
         /** this button's row */
@@ -56,8 +71,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         private int col;
         /** this button's current piece */
         private SoltrChessModel.Piece piece;
-        /** this button's current piece image */
-        private ImageView pieceImage;
         /** this button's graphic */
         private StackPane graphic;
 
@@ -71,38 +84,40 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             this.piece = piece;
             switch (piece) {
                 case BISHOP -> {
-                    this.pieceImage = new ImageView(bishop);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(bishop));
                     this.setGraphic(this.graphic);
                 }
                 case KING -> {
-                    this.pieceImage = new ImageView(king);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(king));
                     this.setGraphic(this.graphic);
                 }
                 case KNIGHT -> {
-                    this.pieceImage = new ImageView(knight);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(knight));
                     this.setGraphic(this.graphic);
                 }
                 case PAWN -> {
-                    this.pieceImage = new ImageView(pawn);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(pawn));
                     this.setGraphic(this.graphic);
                 }
                 case QUEEN -> {
-                    this.pieceImage = new ImageView(queen);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(queen));
                     this.setGraphic(this.graphic);
                 }
                 case ROOK -> {
-                    this.pieceImage = new ImageView(rook);
-                    this.pieceImage.setVisible(true);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(new ImageView(rook));
                     this.setGraphic(this.graphic);
                 }
                 default -> {
-                    this.pieceImage = new ImageView(blue);
-                    this.pieceImage.setVisible(false);
+                    ImageView pieceImage = new ImageView(blue);
+                    pieceImage.setVisible(false);
+                    this.graphic.getChildren().remove(1);
+                    this.graphic.getChildren().add(pieceImage);
                     this.setGraphic(this.graphic);
                 }
             }
@@ -114,12 +129,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
          *
          * @param row this button's row
          * @param col this button's column
-         * @param piece what piece this button is
          */
-        public ChessButton(int row, int col, SoltrChessModel.Piece piece) {
+        public ChessButton(int row, int col) {
             this.row = row;
             this.col = col;
-            this.changePiece(piece);
         }
     }
 
@@ -135,26 +148,44 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         boolean color = true;
         for (int row = 0; row < SoltrChessModel.ROWS; row++) {
             for (int col = 0; col < SoltrChessModel.COLS; col++) {
-                ChessButton button = new ChessButton(row,col, board.getContents(row,col));
+                ChessButton button = new ChessButton(row,col);
                 //button.setMinWidth(100);
                 //button.setMinHeight(100);
                 if (color) {
-                    button.pieceImage = new ImageView(blue);
-                    button.pieceImage.setVisible(false);
+                    ImageView pieceImage = new ImageView(blue);
+                    pieceImage.setVisible(false);
                     button.graphic = new StackPane();
-                    button.graphic.getChildren().addAll(new ImageView(light), button.pieceImage);
+                    button.graphic.getChildren().addAll(new ImageView(light), pieceImage);
                     button.setGraphic(button.graphic);
+                    button.changePiece(board.getContents(row,col));
                     color = false;
                 } else {
-                    button.pieceImage = new ImageView(blue);
-                    button.pieceImage.setVisible(false);
+                    ImageView pieceImage = new ImageView(blue);
+                    pieceImage.setVisible(false);
                     button.graphic = new StackPane();
-                    button.graphic.getChildren().addAll(new ImageView(dark), button.pieceImage);
+                    button.graphic.getChildren().addAll(new ImageView(dark), pieceImage);
                     button.setGraphic(button.graphic);
+                    button.changePiece(board.getContents(row,col));
                     color = true;
                 }
 
                 //button.setOnAction(event -> { if (this.board.isValidMove()) {this.board.makeMove(button.col);}});
+                //button.setOnAction(event -> { button.changePiece(SoltrChessModel.Piece.QUEEN);});
+                button.setOnAction(event -> {
+                    if (!this.selected) {
+                        this.selected = true;
+                        this.selectedRow = button.row;
+                        this.selectedCol = button.col;
+                        this.statusBar.setText("Source selected: (" + this.selectedRow + "," + this.selectedCol + ")");
+                    } else {
+                        this.selected = false;
+                        if (this.board.isValidMove(this.selectedCol, this.selectedRow, button.col, button.row)) {
+                            this.statusBar.setText(this.board.getContents(this.selectedRow, this.selectedCol) + " to (" + button.row + "," + button.col + ")");
+                            this.board.makeMove(this.selectedCol, this.selectedRow, button.col, button.row);
+                        } else {
+                            this.statusBar.setText("Move not Allowed.");
+                        }
+                    }});
                 gridPane.add(button,col,row);
                 this.buttonBoard[row][col] = button;
             }
@@ -177,6 +208,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.board.addObserver(this);
 
         //initialize variables
+        this.selected = false;
         this.finished = false;
         this.buttonBoard = new ChessButton[SoltrChessModel.ROWS][SoltrChessModel.COLS];
 

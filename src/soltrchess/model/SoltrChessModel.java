@@ -244,9 +244,9 @@ public class SoltrChessModel {
             return false;
         } else if (selectedCol == moveCol && selectedRow == moveRow) {
             return false;
-        } else if (selectedCol >= COLS || moveCol >= COLS || selectedCol <= 0 || moveCol <= 0) {
+        } else if (selectedCol >= COLS || moveCol >= COLS || selectedCol < 0 || moveCol < 0) {
            return false;
-       } else if (selectedRow >= ROWS || moveRow >= ROWS || selectedRow <= 0 || moveRow <= 0) {
+       } else if (selectedRow >= ROWS || moveRow >= ROWS || selectedRow < 0 || moveRow < 0) {
            return false;
        }
         Piece next = this.board[selectedRow][selectedCol];
@@ -288,7 +288,7 @@ public class SoltrChessModel {
                 if (selectedCol == moveCol || selectedRow == moveRow) {
                     return false;
                 } else {
-                    return moveRow - selectedRow == 1 && Math.abs(moveCol - selectedCol) == 1;
+                    return selectedRow - moveRow == 1 && Math.abs(moveCol - selectedCol) == 1;
                 }
             }
             case QUEEN -> {
