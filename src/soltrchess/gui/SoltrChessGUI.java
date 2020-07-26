@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-public class SoltrChessGUI extends Application implements Observer<SoltrChessModel,String> {
+public class SoltrChessGUI extends Application implements Observer<SoltrChessModel, SoltrChessModel.Status> {
     /** bishop image */
     private Image bishop = new Image(getClass().getResourceAsStream("resources/bishop.png"));
     /** blue image */
@@ -181,10 +181,12 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                 //button.setOnAction(event -> { button.changePiece(SoltrChessModel.Piece.QUEEN);});
                 button.setOnAction(event -> {
                     if (!this.selected) {
-                        this.selected = true;
-                        this.selectedRow = button.row;
-                        this.selectedCol = button.col;
-                        this.statusBar.setText("Source selected: (" + this.selectedRow + "," + this.selectedCol + ")");
+                        if (!this.finished) {
+                            this.selected = true;
+                            this.selectedRow = button.row;
+                            this.selectedCol = button.col;
+                            this.statusBar.setText("Source selected: (" + this.selectedRow + "," + this.selectedCol + ")");
+                        }
                     } else {
                         this.selected = false;
                         if (this.board.isValidMove(this.selectedCol, this.selectedRow, button.col, button.row)) {
@@ -207,10 +209,15 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        this.finished = false;
         this.selected = false;
         this.board.addObserver(this);
         this.statusBar.setText("Game file: " + filename);
-        this.update(this.board, "restart");
+        if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
+            this.statusBar.setText("You Won!");
+            this.finished = true;
+        }
+        this.update(this.board, SoltrChessModel.Status.NOT_OVER);
     }
 
     /**
@@ -235,6 +242,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
 
         //create the status bar
         this.statusBar = new Label("Game file: " + currentFile);
+        if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
+            this.statusBar.setText("You Won!");
+            this.finished = true;
+        }
         borderPane.setTop(this.statusBar);
         BorderPane.setAlignment(this.statusBar, Pos.CENTER);
 
@@ -271,10 +282,16 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     }
 
     @Override
-    public void update(SoltrChessModel soltrChessModel, String s) {
-        for (int row = 0; row < SoltrChessModel.ROWS; row++) {
-            for (int col = 0; col < SoltrChessModel.COLS; col++) {
-                this.buttonBoard[row][col].changePiece(this.board.getContents(row, col));
+    public void update(SoltrChessModel soltrChessModel, SoltrChessModel.Status gameStatus) {
+            for (int row = 0; row < SoltrChessModel.ROWS; row++) {
+                for (int col = 0; col < SoltrChessModel.COLS; col++) {
+                    this.buttonBoard[row][col].changePiece(this.board.getContents(row, col));
+                }
+            if (gameStatus != SoltrChessModel.Status.NOT_OVER) {
+                this.finished = true;
+                if (gameStatus == SoltrChessModel.Status.SOLVED) {
+                    this.statusBar.setText("You won!");
+                }
             }
         }
     }

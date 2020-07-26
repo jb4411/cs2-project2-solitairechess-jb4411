@@ -38,7 +38,7 @@ public class SoltrChessModel {
     /** the status of the game */
     private Status status;
     /** the observers of this model */
-    private List<Observer<SoltrChessModel, String>> observers;
+    private List<Observer<SoltrChessModel, Status>> observers;
     /** the game board */
     private Piece[][] board;
     /** the column of the piece that was selected */
@@ -96,6 +96,9 @@ public class SoltrChessModel {
             }
         }
         this.observers = new LinkedList<>();
+        if (this.numPieces == 1) {
+            this.status = Status.SOLVED;
+        }
     }
 
     /**
@@ -103,14 +106,14 @@ public class SoltrChessModel {
      *
      * @param observer the observer
      */
-    public void addObserver(Observer<SoltrChessModel, String> observer) {
+    public void addObserver(Observer<SoltrChessModel, Status> observer) {
         this.observers.add(observer);
     }
 
     /** When the model changes, the observers are notified via their update() method */
     private void notifyObservers() {
-        for (Observer<SoltrChessModel, String> obs: this.observers ) {
-            obs.update(this, null);
+        for (Observer<SoltrChessModel, Status> obs: this.observers ) {
+            obs.update(this, status);
         }
     }
 
@@ -253,7 +256,6 @@ public class SoltrChessModel {
      */
     public boolean isValidMove(int selectedCol, int selectedRow, int moveCol, int moveRow) {
        if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
-           System.out.println("none");
             return false;
         } else if (selectedCol == moveCol && selectedRow == moveRow) {
             return false;
