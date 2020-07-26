@@ -216,6 +216,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
             this.statusBar.setText("You Won!");
             this.finished = true;
+        } else if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
+            this.statusBar.setText("Invalid file.");
+            this.finished = true;
         }
         this.update(this.board, SoltrChessModel.Status.NOT_OVER);
     }
@@ -244,6 +247,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.statusBar = new Label("Game file: " + currentFile);
         if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
             this.statusBar.setText("You Won!");
+            this.finished = true;
+        } else if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
+            this.statusBar.setText("Invalid file.");
             this.finished = true;
         }
         borderPane.setTop(this.statusBar);

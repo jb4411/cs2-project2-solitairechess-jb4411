@@ -32,6 +32,7 @@ public class SoltrChessModel {
     public enum Status {
         NOT_OVER,
         SOLVED,
+        INVALID_FILE,
         FAILED
     }
 
@@ -87,16 +88,20 @@ public class SoltrChessModel {
                     case "R" -> {
                         current = Piece.ROOK;
                     }
-                    default -> {
+                    case "-" -> {
                         current = Piece.NONE;
                         this.numPieces--;
+                    }
+                    default -> {
+                        this.status = Status.INVALID_FILE;
+                        current = Piece.NONE;
                     }
                 }
                 this.board[row][col] = current;
             }
         }
         this.observers = new LinkedList<>();
-        if (this.numPieces == 1) {
+        if (this.numPieces == 1 && this.status != Status.INVALID_FILE) {
             this.status = Status.SOLVED;
         }
     }
