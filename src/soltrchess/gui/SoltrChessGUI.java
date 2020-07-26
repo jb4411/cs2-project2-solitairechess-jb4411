@@ -212,7 +212,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.finished = false;
         this.selected = false;
         this.board.addObserver(this);
-        this.statusBar.setText("Game file: " + filename);
+        String[] filenameParts = filename.split("/");
+        String shortName = filenameParts[filenameParts.length - 1];
+        this.statusBar.setText("Game file: " + shortName);
         if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
             this.statusBar.setText("You Won!");
             this.finished = true;
@@ -244,7 +246,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.currentFile = getParameters().getRaw().get(0);
 
         //create the status bar
-        this.statusBar = new Label("Game file: " + currentFile);
+        String[] filenameParts = this.currentFile.split("/");
+        String shortName = filenameParts[filenameParts.length - 1];
+        this.statusBar = new Label("Game file: " + shortName);
         if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
             this.statusBar.setText("You Won!");
             this.finished = true;
