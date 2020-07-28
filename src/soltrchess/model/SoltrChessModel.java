@@ -107,7 +107,7 @@ public class SoltrChessModel {
     }
 
     /**
-     * The view calls this method to add themselves as an observer of the model.
+     * The view calls this method to add itself as an observer of the model.
      *
      * @param observer the observer
      */
@@ -341,7 +341,7 @@ public class SoltrChessModel {
     }
 
     /**
-     * Make a move by placing a disc in a valid column.
+     * Make a move by selecting a piece to move, and a space to move it to.
      *
      * @rit.pre the move must be valid
      * @param selectedCol the column of the selected piece to move
