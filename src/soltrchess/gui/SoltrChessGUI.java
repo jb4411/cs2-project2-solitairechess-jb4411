@@ -78,6 +78,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         return this.selected;
     }
 
+    /**
+     * A class to represent the buttons used to play solitaire chess.
+     */
     private class ChessButton extends Button {
         /** this button's row */
         private int row;
@@ -210,6 +213,12 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         return gridPane;
     }
 
+    /**
+     * Shows a popup informing the user that the file they choose is invalid or
+     * cannot be read.
+     *
+     * @param filename the name of the invalid file
+     */
     public static void ErrorPopup(String filename) {
         //create the border pane that holds the board and status info
         BorderPane borderPane = new BorderPane();
@@ -244,6 +253,11 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         newWindow.show();
     }
 
+    /**
+     * A helper function that is called to restart the game.
+     *
+     * @param filename the file that contains the current board.
+     */
     public void restart(String filename) {
         try {
             this.board = new SoltrChessModel(filename);
@@ -336,6 +350,13 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         }
     }
 
+    /**
+     * Called by the model, model.SoltrChessModel, whenever there is a state
+     * change that needs to be updated by the GUI.
+     *
+     * @param soltrChessModel the board
+     * @param gameStatus the current status of the game
+     */
     @Override
     public void update(SoltrChessModel soltrChessModel, SoltrChessModel.Status gameStatus) {
             for (int row = 0; row < SoltrChessModel.ROWS; row++) {
