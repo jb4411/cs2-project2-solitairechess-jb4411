@@ -224,7 +224,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         bottomBox.getChildren().addAll(errorMsg, errorButton);
         bottomBox.setAlignment(Pos.CENTER);
         bottomBox.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-        //bottomBox.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         borderPane.setBottom(bottomBox);
 
         //top box
@@ -232,13 +231,11 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         Label message = new Label("Message");
         message.setPadding(new Insets(30, 0, 0, 10));
         message.setFont(new Font("Arial", 15));
-
         topBox.getChildren().addAll(message);
         borderPane.setTop(topBox);
 
+        // set up scene and stage
         Scene errorScene = new Scene(borderPane, 360, 160);
-
-        // New window (Stage)
         Stage newWindow = new Stage();
         newWindow.setTitle("Message");
         newWindow.setScene(errorScene);

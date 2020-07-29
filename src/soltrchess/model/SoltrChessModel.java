@@ -62,11 +62,17 @@ public class SoltrChessModel {
         this.numPieces = 0;
 
         Scanner f = new Scanner(new File(filename));
-
+        String next = "";
         // initialize the board
         for (int row=0; row<ROWS; ++row) {
             for (int col=0; col<COLS; ++col) {
-                String next = f.next();
+                try {
+                    next = f.next();
+                } catch (Exception e) {
+                    this.status = Status.INVALID_FILE;
+                    next = "bad file";
+                }
+
                 Piece current;
                 this.numPieces++;
                 switch (next) {
