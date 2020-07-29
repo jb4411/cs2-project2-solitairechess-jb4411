@@ -1,6 +1,9 @@
 package soltrchess.gui;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -9,7 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import soltrchess.model.Observer;
 import soltrchess.model.SoltrChessModel;
@@ -203,6 +210,43 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         return gridPane;
     }
 
+    public static void ErrorPopup(String filename) {
+        //create the border pane that holds the board and status info
+        BorderPane borderPane = new BorderPane();
+
+        //bottom box
+        HBox bottomBox = new HBox();
+        Label errorMsg = new Label("Invalid content found in " + filename);
+        errorMsg.setPadding(new Insets(20, 0, 50, 0));
+        Button errorButton = new Button("OK");
+        errorButton.setPrefWidth(80);
+        bottomBox.setSpacing(40);
+        bottomBox.getChildren().addAll(errorMsg, errorButton);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.setBorder(new Border(new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        //bottomBox.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        borderPane.setBottom(bottomBox);
+
+        //top box
+        HBox topBox = new HBox();
+        Label message = new Label("Message");
+        message.setPadding(new Insets(30, 0, 0, 10));
+        message.setFont(new Font("Arial", 15));
+
+        topBox.getChildren().addAll(message);
+        borderPane.setTop(topBox);
+
+        Scene errorScene = new Scene(borderPane, 360, 160);
+
+        // New window (Stage)
+        Stage newWindow = new Stage();
+        newWindow.setTitle("Message");
+        newWindow.setScene(errorScene);
+
+        errorButton.setOnAction(event -> newWindow.hide());
+        newWindow.show();
+    }
+
     public void restart(String filename) {
         try {
             this.board = new SoltrChessModel(filename);
@@ -220,6 +264,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             this.finished = true;
         } else if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
             this.statusBar.setText("Invalid file.");
+            ErrorPopup(shortName);
             this.finished = true;
         }
         this.update(this.board, SoltrChessModel.Status.NOT_OVER);
@@ -289,6 +334,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
+            ErrorPopup(shortName);
+        }
     }
 
     @Override
