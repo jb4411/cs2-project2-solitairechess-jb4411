@@ -26,6 +26,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+/**
+ * A JavaFX GUI for the Solitaire Chess game.
+ *
+ * @author RIT CS
+ * @author Jesse Burdick-Pless jb4411@g.rit.edu
+ */
 public class SoltrChessGUI extends Application implements Observer<SoltrChessModel, SoltrChessModel.Status> {
     /** bishop image */
     private Image bishop = new Image(getClass().getResourceAsStream("resources/bishop.png"));
