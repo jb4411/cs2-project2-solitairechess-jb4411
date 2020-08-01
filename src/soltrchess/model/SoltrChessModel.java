@@ -266,15 +266,15 @@ public class SoltrChessModel {
      * @return whether or not the move is valid
      */
     public boolean isValidMove(int selectedCol, int selectedRow, int moveCol, int moveRow) {
-       if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
+        if (selectedCol >= COLS || moveCol >= COLS || selectedCol < 0 || moveCol < 0) {
+            return false;
+        } else if (selectedRow >= ROWS || moveRow >= ROWS || selectedRow < 0 || moveRow < 0) {
+            return false;
+        } else if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
             return false;
         } else if (selectedCol == moveCol && selectedRow == moveRow) {
             return false;
-        } else if (selectedCol >= COLS || moveCol >= COLS || selectedCol < 0 || moveCol < 0) {
-           return false;
-       } else if (selectedRow >= ROWS || moveRow >= ROWS || selectedRow < 0 || moveRow < 0) {
-           return false;
-       }
+        }
         Piece next = this.board[selectedRow][selectedCol];
         switch (next) {
             case BISHOP -> {
