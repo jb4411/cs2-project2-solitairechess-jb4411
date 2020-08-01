@@ -13,19 +13,13 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
     private SoltrChessModel board;
     /** whether or not the game has ended */
     private boolean finished;
-    /** has a starting piece been selected? */
-    private boolean selected;
-    /** the column of the piece that was selected */
-    private int selectedCol;
-    /** the row of the piece that was selected */
-    private int selectedRow;
     /** the current file */
     private String currentFile;
-    /** list of commands */
+    /** the list of valid commands */
     private static final ArrayList<String> VALID_COMMANDS = new ArrayList<>(Arrays.asList("move", "new", "restart", "hint", "solve", "quit"));
 
     /**
-     * Construct the PTUI
+     * Construct the PTUI.
      *
      * @param filename the file name
      */
@@ -46,7 +40,6 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
             e.printStackTrace();
         }
         this.finished = false;
-        this.selected = false;
         this.board.addObserver(this);
         String[] filenameParts = filename.split("/");
         String shortName = filenameParts[filenameParts.length - 1];
@@ -106,9 +99,9 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
             moveCol = in.nextInt();
             validMove = this.board.isValidMove(selectedCol,selectedRow,moveCol,moveRow);
             if (!validMove) {
-                System.out.print("\nInvalid move.");
+                System.out.print("\nInvalid move.\n");
             } else {
-                System.out.println((this.board.getContents(this.selectedRow, this.selectedCol) + " to (" + moveRow + "," + moveCol + ")"));
+                System.out.println((this.board.getContents(selectedRow, selectedCol) + " to (" + moveRow + "," + moveCol + ")"));
                 this.board.makeMove(selectedCol,selectedRow,moveCol,moveRow);
                 //this.update(this.board, this.board.getGameStatus());
             }
@@ -163,7 +156,9 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
      */
     @Override
     public void update(SoltrChessModel soltrChessModel, SoltrChessModel.Status gameStatus) {
-        System.out.print(this.board.toString());
+        if (gameStatus != SoltrChessModel.Status.INVALID_FILE) {
+            System.out.print(this.board.toString());
+        }
         if (gameStatus != SoltrChessModel.Status.NOT_OVER) {
             this.finished = true;
             if (gameStatus == SoltrChessModel.Status.SOLVED) {
