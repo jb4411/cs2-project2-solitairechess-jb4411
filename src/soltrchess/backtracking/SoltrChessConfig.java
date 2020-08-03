@@ -2,7 +2,6 @@ package soltrchess.backtracking;
 
 import soltrchess.model.SoltrChessModel;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +16,7 @@ public class SoltrChessConfig implements Configuration {
     /** a list of the coordinates of all pieces currently on the board */
     private ArrayList<ArrayList<Integer>> pieces;
 
-    SoltrChessConfig(SoltrChessModel board, SoltrChessModel.Piece[][] pieceBoard) throws FileNotFoundException {
+    public SoltrChessConfig(SoltrChessModel board, SoltrChessModel.Piece[][] pieceBoard) {
         this.pieceBoard = pieceBoard;
         this.numPieces = 0;
         this.pieces = new ArrayList<>();
@@ -35,12 +34,16 @@ public class SoltrChessConfig implements Configuration {
 
     public SoltrChessConfig(SoltrChessConfig copy, ArrayList<Integer> startPiece, ArrayList<Integer> endPiece) {
         this.board = new SoltrChessModel(copy.board);
-        this.numPieces = copy.numPieces;
+        this.numPieces = 0;
         this.pieceBoard = new SoltrChessModel.Piece[SoltrChessModel.ROWS][SoltrChessModel.COLS];
         this.pieces = new ArrayList<>();
-        for (int r=0; r<SoltrChessModel.ROWS; r++) {
-            System.arraycopy(copy.pieceBoard[r], 0, this.pieceBoard[r], 0, SoltrChessModel.COLS);
+        this.board.makeMove(startPiece.get(1), startPiece.get(0), endPiece.get(1), endPiece.get(0));
+        for (int row=0; row< SoltrChessModel.ROWS; ++row) {
+            for (int col = 0; col < SoltrChessModel.COLS; ++col) {
+                this.pieceBoard[row][col] = this.board.getContents(row, col);
+            }
         }
+
         for (int row=0; row<SoltrChessModel.ROWS; ++row) {
             for (int col = 0; col < SoltrChessModel.COLS; ++col) {
                 if (this.pieceBoard[row][col] != SoltrChessModel.Piece.NONE) {
@@ -49,7 +52,6 @@ public class SoltrChessConfig implements Configuration {
                 }
             }
         }
-        this.board.makeMove(startPiece.get(1), startPiece.get(0), endPiece.get(1), endPiece.get(0));
     }
 
     @Override

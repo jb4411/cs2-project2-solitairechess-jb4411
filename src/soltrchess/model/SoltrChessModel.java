@@ -120,7 +120,7 @@ public class SoltrChessModel {
      */
     public SoltrChessModel(SoltrChessModel copy) {
         this.status = copy.status;
-        this.observers = copy.observers;
+        this.observers = new LinkedList<>();
         this.board = new Piece[ROWS][COLS];
         for (int r=0; r<ROWS; r++) {
             System.arraycopy(copy.board[r], 0, this.board[r], 0, COLS);
@@ -155,6 +155,15 @@ public class SoltrChessModel {
      */
     public Status getGameStatus() {
         return this.status;
+    }
+
+    /**
+     * Get the piece board.
+     *
+     * @return the piece board
+     */
+    public Piece[][] getPieceBoard() {
+        return this.board;
     }
 
     /**

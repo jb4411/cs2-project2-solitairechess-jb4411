@@ -1,11 +1,15 @@
 package soltrchess.ptui;
 
+import soltrchess.backtracking.Backtracker;
+import soltrchess.backtracking.Configuration;
+import soltrchess.backtracking.SoltrChessConfig;
 import soltrchess.model.Observer;
 import soltrchess.model.SoltrChessModel;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel.Status> {
@@ -140,7 +144,13 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
 
                 }
                 case "solve" -> {
-
+                    Backtracker solver = new Backtracker();
+                    Optional<Configuration> solution = solver.solve(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
+                    if (solution.isPresent()) {
+                        System.out.println("Solution:\n" + solution.get());
+                    } else {
+                        System.out.println("No solution");
+                    }
                 }
                 case "quit" -> {
                     running = false;
