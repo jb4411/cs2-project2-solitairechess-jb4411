@@ -54,6 +54,10 @@ public class SoltrChessConfig implements Configuration {
         }
     }
 
+    public SoltrChessModel getBoard() {
+        return this.board;
+    }
+
     @Override
     public Collection<Configuration> getSuccessors() {
         ArrayList<Configuration> successors = new ArrayList<>();
@@ -82,5 +86,10 @@ public class SoltrChessConfig implements Configuration {
     @Override
     public boolean isGoal() {
         return this.numPieces == 1;
+    }
+
+    @Override
+    public String toString() {
+        return this.board.toString();
     }
 }

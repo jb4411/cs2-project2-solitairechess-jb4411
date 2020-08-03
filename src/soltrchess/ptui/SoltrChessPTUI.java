@@ -7,10 +7,7 @@ import soltrchess.model.Observer;
 import soltrchess.model.SoltrChessModel;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel.Status> {
     /** the game board */
@@ -141,16 +138,50 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                     this.restart(this.currentFile);
                 }
                 case "hint" -> {
-
+                    if (!this.finished) {
+                        Backtracker solver = new Backtracker();
+                        List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
+                        if (solution != null) {
+                            solution.remove(0);
+                            SoltrChessConfig configBoard = (SoltrChessConfig) solution.get(0);
+                            this.board = configBoard.getBoard();
+                            this.board.addObserver(this);
+                            System.out.println("Next move: ");
+                            this.update(this.board, this.board.getGameStatus());
+                        } else {
+                            System.out.println("No solution");
+                        }
+                    } else {
+                        System.out.print("You've already won.\n");
+                    }
                 }
                 case "solve" -> {
-                    Backtracker solver = new Backtracker();
+                    if (!this.finished) {
+                        //solve with path
+                        Backtracker solver = new Backtracker();
+                        List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
+                        if (solution != null) {
+                            solution.remove(0);
+                            for (int i = 0; i < solution.size(); i++) {
+                                System.out.println("STEP " + (i+1));
+                                System.out.println(solution.get(i).toString());
+                            }
+                            this.finished = true;
+                            System.out.println("You won. Congratulations!");
+                        } else {
+                            System.out.println("No solution");
+                        }
+                    } else {
+                        System.out.print("You've already won.\n");
+                    }
+                    //solve
+                    /*Backtracker solver = new Backtracker();
                     Optional<Configuration> solution = solver.solve(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
                     if (solution.isPresent()) {
                         System.out.println("Solution:\n" + solution.get());
                     } else {
                         System.out.println("No solution");
-                    }
+                    }*/
                 }
                 case "quit" -> {
                     running = false;

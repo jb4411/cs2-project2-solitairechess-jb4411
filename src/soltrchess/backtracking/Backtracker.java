@@ -6,8 +6,7 @@ package soltrchess.backtracking;/*
  * implement.
  */
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * This class represents the classic recursive solitarechess.backtracking algorithm.
@@ -47,8 +46,24 @@ public class Backtracker {
      * @return a list of configurations to get to a goal configuration.
      *         If there are none, return null.
      */
-    public List< Configuration > solveWithPath( Configuration current ) {
-        // YOUR CODE HERE
+    public List<Configuration> solveWithPath(Configuration current) {
+        if (current.isGoal()) {
+            return new ArrayList<>(Collections.singletonList(current));
+        } else {
+            for (Configuration child : current.getSuccessors()) {
+                if (child.isValid()) {
+                    List<Configuration> next = solveWithPath(child);
+                    if (next != null) {
+                        List<Configuration> config = new ArrayList<>();
+                        config.add(current);
+                        config.addAll(next);
+                        return config;
+                    }
+
+                }
+            }
+            // implicit solitarechess.backtracking happens here
+        }
         return null;
     }
 
