@@ -70,7 +70,9 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
             String cmd = in.nextLine();
             if (VALID_COMMANDS.contains(cmd)) {
                 command = cmd;
-                break;
+            } else {
+                System.out.println("Invalid Command: " + cmd);
+                validCMD = false;
             }
         }
         return command;
@@ -122,7 +124,7 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                     if (!this.finished) {
                         this.makeMove(in);
                     } else {
-                        System.out.print("You've already won.");
+                        System.out.print("You've already won.\n");
                     }
                 }
                 case "new" -> {

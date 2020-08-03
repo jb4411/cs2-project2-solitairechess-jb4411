@@ -50,7 +50,7 @@ public class SoltrChessModel {
     private int moveCol;
     /** the row of the place to move to */
     private int moveRow;
-    /** */
+    /** the current number of pieces on the board */
     private int numPieces;
 
     /**
@@ -110,6 +110,26 @@ public class SoltrChessModel {
         if (this.numPieces == 1 && this.status != Status.INVALID_FILE) {
             this.status = Status.SOLVED;
         }
+        f.close();
+    }
+
+    /**
+     * Copy constructor
+     *
+     * @param copy SoltrChessModel instance
+     */
+    public SoltrChessModel(SoltrChessModel copy) {
+        this.status = copy.status;
+        this.observers = copy.observers;
+        this.board = new Piece[ROWS][COLS];
+        for (int r=0; r<ROWS; r++) {
+            System.arraycopy(copy.board[r], 0, this.board[r], 0, COLS);
+        }
+        this.selectedCol = copy.selectedCol;
+        this.selectedRow = copy.selectedRow;
+        this.moveCol = copy.moveCol;
+        this.moveRow = copy.moveRow;
+        this.numPieces = copy.numPieces;
     }
 
     /**
@@ -270,9 +290,9 @@ public class SoltrChessModel {
             return false;
         } else if (selectedRow >= ROWS || moveRow >= ROWS || selectedRow < 0 || moveRow < 0) {
             return false;
-        } else if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
-            return false;
         } else if (selectedCol == moveCol && selectedRow == moveRow) {
+            return false;
+        } else if (this.board[moveRow][moveCol].equals(Piece.NONE)) {
             return false;
         }
         Piece next = this.board[selectedRow][selectedCol];
