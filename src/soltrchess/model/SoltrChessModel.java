@@ -33,6 +33,7 @@ public class SoltrChessModel {
         NOT_OVER,
         SOLVED,
         INVALID_FILE,
+        SOLVING,
         FAILED
     }
 

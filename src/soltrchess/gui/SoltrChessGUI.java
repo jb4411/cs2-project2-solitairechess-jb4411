@@ -79,6 +79,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private FileChooser fileChooser;
     /** the current file */
     private String currentFile;
+    /** current step if solving */
+    private int currentStep;
+    /** the final step number if solving */
+    private int finalStep;
 
     /**
      * Has a starting piece been selected?
@@ -364,9 +368,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             }
         });
         this.controlButtons.getChildren().add(hint);
-
-
-
         //create solve button
         Button solve = new Button("Solve");
         solve.setOnAction(event -> {
@@ -375,21 +376,9 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                 Backtracker solver = new Backtracker();
                 List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
                 if (solution != null) {
-                    solution.remove(0);
-                    for (int i = 0; i < solution.size(); i++) {
-                        SoltrChessConfig configBoard = (SoltrChessConfig) solution.get(i);
-                        this.board = configBoard.getBoard();
-                        this.board.addObserver(this);
-                        this.statusBar.setText("STEP " + (i+1));
-                        this.update(this.board, this.board.getGameStatus());
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    this.finished = true;
-                    this.statusBar.setText("You won. Congratulations!");
+                    this.finalStep = solution.size();
+                    Solver guiSolve = new Solver(this, solution);
+                    guiSolve.start();
                 } else {
                     this.statusBar.setText("No solution");
                 }
@@ -398,9 +387,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             }
         });
         this.controlButtons.getChildren().add(solve);
-
-
-
+        //add control buttons to the borderpane
         this.controlButtons.setAlignment(Pos.CENTER);
         borderPane.setBottom(this.controlButtons);
 
@@ -419,6 +406,34 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         }
     }
 
+    private static class Solver extends Thread {
+        private SoltrChessGUI gui;
+        private List<Configuration> solution;
+
+        public Solver(SoltrChessGUI gui, List<Configuration> solution) {
+            this.gui = gui;
+            this.solution = solution;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < this.solution.size(); i++) {
+                SoltrChessConfig configBoard = (SoltrChessConfig) this.solution.get(i);
+                this.gui.board = configBoard.getBoard();
+                this.gui.board.addObserver(this.gui);
+                try {
+                    Thread.sleep( 1000 );
+                    this.gui.currentStep = i+1;
+                    javafx.application.Platform.runLater( () ->
+                        this.gui.update(this.gui.board, SoltrChessModel.Status.SOLVING)
+                    );
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     /**
      * Called by the model, model.SoltrChessModel, whenever there is a state
      * change that needs to be updated by the GUI.
@@ -432,10 +447,17 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             for (int col = 0; col < SoltrChessModel.COLS; col++) {
                 this.buttonBoard[row][col].changePiece(this.board.getContents(row, col));
             }
-            if (gameStatus != SoltrChessModel.Status.NOT_OVER) {
+            if (gameStatus != SoltrChessModel.Status.NOT_OVER && gameStatus != SoltrChessModel.Status.SOLVING) {
                 this.finished = true;
                 if (gameStatus == SoltrChessModel.Status.SOLVED) {
-                    this.statusBar.setText("You won!");
+                    this.statusBar.setText("You won. Congratulations!");
+                }
+            } else if (gameStatus == SoltrChessModel.Status.SOLVING){
+                if (this.currentStep != this.finalStep) {
+                    this.statusBar.setText("STEP " + this.currentStep);
+                } else {
+                    this.statusBar.setText("You won. Congratulations!");
+                    this.finished = true;
                 }
             }
         }
