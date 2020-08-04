@@ -1,4 +1,5 @@
-package soltrchess.backtracking;/*
+package soltrchess.backtracking;
+/*
  * solitarechess.backtracking.Backtracker.java
  *
  * This file comes from the solitarechess.backtracking lab. It should be useful
@@ -14,6 +15,7 @@ import java.util.*;
  * solution, if one exists.
  * 
  * @author RIT CS
+ * @author Jesse Burdick-Pless jb4411@g.rit.edu
  */
 public class Backtracker {
     

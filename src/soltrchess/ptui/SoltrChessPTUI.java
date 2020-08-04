@@ -9,6 +9,12 @@ import soltrchess.model.SoltrChessModel;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * A PTUI for the Solitaire Chess game.
+ *
+ * @author RIT CS
+ * @author Jesse Burdick-Pless jb4411@g.rit.edu
+ */
 public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel.Status> {
     /** the game board */
     private SoltrChessModel board;
@@ -174,14 +180,6 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                     } else {
                         System.out.print("You've already won.\n");
                     }
-                    //solve
-                    /*Backtracker solver = new Backtracker();
-                    Optional<Configuration> solution = solver.solve(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
-                    if (solution.isPresent()) {
-                        System.out.println("Solution:\n" + solution.get());
-                    } else {
-                        System.out.println("No solution");
-                    }*/
                 }
                 case "quit" -> {
                     running = false;

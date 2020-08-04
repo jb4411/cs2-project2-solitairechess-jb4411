@@ -182,8 +182,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             color = !color;
             for (int col = 0; col < SoltrChessModel.COLS; col++) {
                 ChessButton button = new ChessButton(row,col);
-                //button.setMinWidth(100);
-                //button.setMinHeight(100);
                 if (color) {
                     ImageView pieceImage = new ImageView(blue);
                     pieceImage.setVisible(false);
@@ -201,9 +199,6 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                     button.changePiece(this.board.getContents(row,col));
                     color = true;
                 }
-
-                //button.setOnAction(event -> { if (this.board.isValidMove()) {this.board.makeMove(button.col);}});
-                //button.setOnAction(event -> { button.changePiece(SoltrChessModel.Piece.QUEEN);});
                 button.setOnAction(event -> {
                     if (!this.selected) {
                         if (!this.finished) {
@@ -406,15 +401,29 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         }
     }
 
+    /**
+     * A subclass used to show the steps of the solve function.
+     */
     private static class Solver extends Thread {
+        /** the javaFX GUI */
         private SoltrChessGUI gui;
+        /** the steps to solve the current board */
         private List<Configuration> solution;
 
+        /**
+         * Constructor.
+         *
+         * @param gui the javaFX GUI
+         * @param solution the steps to solve the current board
+         */
         public Solver(SoltrChessGUI gui, List<Configuration> solution) {
             this.gui = gui;
             this.solution = solution;
         }
 
+        /**
+         * Show the steps of the solve function and update the GUI accordingly.
+         */
         @Override
         public void run() {
             for (int i = 0; i < this.solution.size(); i++) {
