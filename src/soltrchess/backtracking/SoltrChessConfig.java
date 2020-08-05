@@ -14,7 +14,7 @@ import java.util.Collection;
 public class SoltrChessConfig implements Configuration {
     /** the game board */
     private SoltrChessModel board;
-    /** the game board */
+    /** a 2D array of the pieces on the board */
     private SoltrChessModel.Piece[][] pieceBoard;
     /** the current number of pieces on the board */
     private int numPieces;

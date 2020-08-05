@@ -63,7 +63,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private Label statusBar;
     /** the game board */
     private SoltrChessModel board;
-    /** a 2D array of every button in the board */
+    /** a 2D array of every button on the board */
     private ChessButton[][] buttonBoard;
     /** whether or not the game has ended */
     private boolean finished;
@@ -110,7 +110,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
          * A helper function that changes the piece and image of the button
          * passed in through the parameter.
          *
-         * @param piece the button to have it's image and piece changed
+         * @param piece the button to have its image and piece changed
          */
         public void changePiece(SoltrChessModel.Piece piece) {
             this.piece = piece;
@@ -224,7 +224,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     }
 
     /**
-     * Shows a popup informing the user that the file they choose is invalid or
+     * Shows a popup informing the user that the file choosen is invalid or
      * cannot be read.
      *
      * @param filename the name of the invalid file
