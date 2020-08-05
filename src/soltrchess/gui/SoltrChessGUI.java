@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A JavaFX GUI for the Solitaire Chess game.
+ * A JavaFX GUI for the Solitaire Chess game. (Includes extra credit portion)
  *
  * @author RIT CS
  * @author Jesse Burdick-Pless jb4411@g.rit.edu

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Represents a single configuration in the SoltrChess game.
+ * Represents a single configuration in the SoltrChess game. (Includes extra credit portion)
  *
  * @author Jesse Burdick-Pless jb4411@g.rit.edu
  */
