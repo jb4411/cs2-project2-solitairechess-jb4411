@@ -22,6 +22,8 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
     private boolean finished;
     /** the current file */
     private String currentFile;
+    /** whether or not the current file is valid */
+    private boolean validFile;
     /** the list of valid commands */
     private static final ArrayList<String> VALID_COMMANDS = new ArrayList<>(Arrays.asList("move", "new", "restart", "hint", "solve", "quit"));
 
@@ -46,6 +48,7 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        this.validFile = true;
         this.finished = false;
         this.board.addObserver(this);
         String[] filenameParts = filename.split("/");
@@ -56,6 +59,7 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
             this.finished = true;
         } else if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
             System.out.println("Invalid file.");
+            this.validFile = false;
             //ErrorPopup(shortName);
             this.finished = true;
         }
@@ -144,7 +148,7 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                     this.restart(this.currentFile);
                 }
                 case "hint" -> {
-                    if (!this.finished) {
+                    if (!this.finished && this.validFile) {
                         Backtracker solver = new Backtracker();
                         List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
                         if (solution != null) {
@@ -157,8 +161,10 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                         } else {
                             System.out.println("No solution");
                         }
-                    } else {
+                    } else if (this.validFile){
                         System.out.print("You've already won.\n");
+                    } else {
+                        System.out.println("Invalid file.");
                     }
                 }
                 case "solve" -> {
@@ -177,8 +183,10 @@ public class SoltrChessPTUI implements Observer<SoltrChessModel, SoltrChessModel
                         } else {
                             System.out.println("No solution");
                         }
-                    } else {
+                    } else if (this.validFile) {
                         System.out.print("You've already won.\n");
+                    } else {
+                        System.out.println("Invalid file.");
                     }
                 }
                 case "quit" -> {

@@ -83,6 +83,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
     private int currentStep;
     /** the final step number if solving */
     private int finalStep;
+    /** whether or not the board is currently being solved */
+    private boolean solving;
+    /** whether or not the current file is valid */
+    private boolean validFile;
 
     /**
      * Has a starting piece been selected?
@@ -269,6 +273,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
      * @param filename the file that contains the current board.
      */
     public void restart(String filename) {
+        this.solving = false;
         try {
             this.board = new SoltrChessModel(filename);
         } catch (FileNotFoundException e) {
@@ -280,6 +285,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         String[] filenameParts = filename.split("/");
         String shortName = filenameParts[filenameParts.length - 1];
         this.statusBar.setText("Game file: " + shortName);
+        this.validFile = true;
         if (this.board.getGameStatus() == SoltrChessModel.Status.SOLVED) {
             this.statusBar.setText("You Won!");
             this.finished = true;
@@ -287,6 +293,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
             this.statusBar.setText("Invalid file.");
             ErrorPopup(shortName);
             this.finished = true;
+            this.validFile = false;
         }
         this.update(this.board, SoltrChessModel.Status.NOT_OVER);
     }
@@ -310,6 +317,8 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         this.finished = false;
         this.buttonBoard = new ChessButton[SoltrChessModel.ROWS][SoltrChessModel.COLS];
         this.currentFile = getParameters().getRaw().get(0);
+        this.solving = false;
+        this.validFile = true;
 
         //create the status bar
         String[] filenameParts = this.currentFile.split("/");
@@ -321,6 +330,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         } else if (this.board.getGameStatus() == SoltrChessModel.Status.INVALID_FILE) {
             this.statusBar.setText("Invalid file.");
             this.finished = true;
+            this.validFile = false;
         }
         borderPane.setTop(this.statusBar);
         BorderPane.setAlignment(this.statusBar, Pos.CENTER);
@@ -345,7 +355,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         //create hint button
         Button hint = new Button("Hint");
         hint.setOnAction(event -> {
-            if (!this.finished) {
+            if (!this.finished && !this.solving) {
                 Backtracker solver = new Backtracker();
                 List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
                 if (solution != null) {
@@ -358,8 +368,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                 } else {
                     this.statusBar.setText("No solution");
                 }
-            } else {
+            } else if (this.validFile && !this.solving){
                 this.statusBar.setText("You've already won.");
+            } else if (!this.solving) {
+                this.restart(this.currentFile);
             }
         });
         this.controlButtons.getChildren().add(hint);
@@ -368,6 +380,7 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         solve.setOnAction(event -> {
             if (!this.finished) {
                 //solve with path
+                this.solving = true;
                 Backtracker solver = new Backtracker();
                 List<Configuration> solution = solver.solveWithPath(new SoltrChessConfig(new SoltrChessModel(this.board), this.board.getPieceBoard()));
                 if (solution != null) {
@@ -377,8 +390,10 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                 } else {
                     this.statusBar.setText("No solution");
                 }
-            } else {
+            } else if (this.validFile){
                 this.statusBar.setText("You've already won.");
+            } else {
+                this.restart(this.currentFile);
             }
         });
         this.controlButtons.getChildren().add(solve);
@@ -427,17 +442,21 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
         @Override
         public void run() {
             for (int i = 0; i < this.solution.size(); i++) {
-                SoltrChessConfig configBoard = (SoltrChessConfig) this.solution.get(i);
-                this.gui.board = configBoard.getBoard();
-                this.gui.board.addObserver(this.gui);
-                try {
-                    Thread.sleep( 1000 );
-                    this.gui.currentStep = i+1;
-                    javafx.application.Platform.runLater( () ->
-                        this.gui.update(this.gui.board, SoltrChessModel.Status.SOLVING)
-                    );
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (this.gui.solving) {
+                    SoltrChessConfig configBoard = (SoltrChessConfig) this.solution.get(i);
+                    this.gui.board = configBoard.getBoard();
+                    this.gui.board.addObserver(this.gui);
+                    try {
+                        Thread.sleep(1000);
+                        if (this.gui.solving) {
+                            this.gui.currentStep = i + 1;
+                            javafx.application.Platform.runLater(() ->
+                                    this.gui.update(this.gui.board, SoltrChessModel.Status.SOLVING)
+                            );
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -462,11 +481,13 @@ public class SoltrChessGUI extends Application implements Observer<SoltrChessMod
                     this.statusBar.setText("You won. Congratulations!");
                 }
             } else if (gameStatus == SoltrChessModel.Status.SOLVING){
-                if (this.currentStep != this.finalStep) {
-                    this.statusBar.setText("STEP " + this.currentStep);
-                } else {
-                    this.statusBar.setText("You won. Congratulations!");
-                    this.finished = true;
+                if (this.solving) {
+                    if (this.currentStep != this.finalStep) {
+                        this.statusBar.setText("STEP " + this.currentStep);
+                    } else {
+                        this.statusBar.setText("You won. Congratulations!");
+                        this.finished = true;
+                    }
                 }
             }
         }
